@@ -14,7 +14,8 @@ python tools.py         # Task 2: test độc lập 3 tools
 python run_tests.py     # Task 4: 5 câu test — khi nào direct, khi nào gọi tool
 python demo_errors.py   # Task 5: tái hiện & phân loại 3 nhóm lỗi
 python agent.py         # Task 3: chạy thử qua agent loop
-python -m unittest discover -s test
+python -m unittest discover -s test # Chạy unit test của từng tool cũng như harness
+python travel_buddy_demo.py # Chạy web app demo 
 ```
 
 Mặc định dùng **MockModel** (model giả lập) nên kết quả luôn giống nhau,
@@ -22,7 +23,13 @@ offline. Muốn thử **model thật Google Gemini**:
 
 ```bash
 export GEMINI_API_KEY=...          # lấy tại https://aistudio.google.com/apikey
-LAB_MODEL=gemini python run_tests.py
+$env:LAB_MODEL='gemini'; python run_tests.py
+```
+
+Muốn thử **model của NVIDIA**:
+
+```bash
+$env:TRAVEL_BUDDY_MODEL='nvidia'; python travel_buddy.py
 ```
 
 ## TravelBuddy (cần `GEMINI_API_KEY`, có thể đặt trong `.env`)
