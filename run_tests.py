@@ -18,21 +18,21 @@ from llm import get_model
 
 # (câu hỏi, tool kỳ vọng hoặc None nếu kỳ vọng trả lời trực tiếp, ghi chú)
 TEST_CASES = [
-    ("Thời tiết Hà Nội hôm nay thế nào?",
-     "get_weather",
-     "Happy path — API wrapper: đủ thông tin (thành phố) -> GỌI TOOL."),
+    ("Tìm chuyến bay HAN đến DAD ngày 2099-01-01 cho 2 người",
+     "search_flights",
+     "Happy path: đủ điểm đi, điểm đến, ngày bay, số khách -> GỌI TOOL."),
 
-    ("Doanh thu miền Bắc tháng này bao nhiêu?",
-     "query_sales",
-     "Happy path — data query: có khu vực -> GỌI TOOL."),
+    ("Thời tiết Hà Nội hôm nay thế nào?",
+     None,
+     "Ngoài phạm vi: không có tool thời tiết -> TRẢ LỜI TRỰC TIẾP, không tool."),
 
     ("Xin chào, bạn là ai?",
      None,
      "Conditional/direct: chào hỏi -> TRẢ LỜI TRỰC TIẾP, không tool."),
 
-    ("Cho tôi xem thời tiết đi.",
+    ("Cho tôi tìm chuyến bay đi.",
      None,
-     "Edge case: hỏi thời tiết nhưng THIẾU thành phố -> hỏi lại, KHÔNG tool."),
+     "Edge case: tìm chuyến bay nhưng THIẾU thông tin -> hỏi lại, KHÔNG tool."),
 
     ("Bạn nghĩ giá bitcoin ngày mai thế nào?",
      None,
@@ -65,8 +65,8 @@ def main() -> None:
     print(f"{'#':<3}{'Kỳ vọng':<34}{'Thực tế':<34}{'':<6}")
     for i, exp, act, ok in summary:
         print(f"{i:<3}{exp:<34}{act:<34}{'PASS' if ok else 'FAIL'}")
-    print("\nGhi chú: 2 câu GỌI TOOL (mỗi tool 1 câu), 3 câu TRẢ LỜI TRỰC TIẾP")
-    print("(chào hỏi / thiếu thông tin / ngoài phạm vi). Đúng như thiết kế policy.")
+    print("\nGhi chú: 1 câu GỌI TOOL, 4 câu TRẢ LỜI TRỰC TIẾP (không có tool phù hợp /")
+    print("chào hỏi / thiếu thông tin / ngoài phạm vi). Đúng như thiết kế policy.")
 
 
 if __name__ == "__main__":

@@ -8,7 +8,7 @@
 | # | Nhóm lỗi | Dấu hiệu (symptom) | Nguyên nhân gốc | Cách sửa |
 |---|----------|--------------------|-----------------|----------|
 | 1 | **PROMPT** | Hỏi giá bitcoin → agent **bịa** "tăng ~5%" thay vì từ chối | System prompt mơ hồ, thiếu `Constraints`, còn ép *"make your best guess"* | Thêm ràng buộc `NEVER: lời khuyên tài chính` + quy tắc từ chối khi ngoài phạm vi |
-| 2 | **TOOL SCHEMA** | `query_sales(region="miền Bắc")` → `INVALID_ARGUMENT` | Schema `region` **thiếu `enum`/ví dụ** → model đoán giá trị theo ngôn ngữ người dùng | Khai báo `"enum": ["North","South","Central"]` để model buộc truyền đúng mã |
+| 2 | **TOOL SCHEMA** | `search_flights(origin="Hà Nội", ...)` → `INVALID_ARGUMENT` | Schema `origin` **thiếu mô tả định dạng/ví dụ** → model đoán giá trị theo ngôn ngữ người dùng | Mô tả rõ `"Mã IATA sân bay đi, ví dụ 'HAN'"` để model truyền đúng mã |
 | 3 | **CONTROL FLOW** | Gọi tool xong nhưng câu trả lời **rỗng** | Vòng lặp agent **quên bước 4** (feed tool result trở lại model) | Sau khi execute tool, luôn gọi lại model với kết quả rồi mới trả lời |
 
 ## Chi tiết & cách phân biệt
@@ -22,7 +22,7 @@
   đổi câu chữ prompt là hành vi đổi theo.
 
 ### 2. Lỗi TOOL SCHEMA
-- **Bằng chứng:** hàm `query_sales("North")` chạy đúng khi test độc lập; chỉ hỏng
+- **Bằng chứng:** hàm `search_flights("HAN", ...)` chạy đúng khi test độc lập; chỉ hỏng
   khi **arguments** sai giá trị. Root cause là mô tả schema, không phải logic hàm.
 - **Bám slide:** *Tool Schema Anatomy*, *Parameter Design Best Practices*
   (dùng `enum`, ví dụ trong description để giảm lỗi arguments) và

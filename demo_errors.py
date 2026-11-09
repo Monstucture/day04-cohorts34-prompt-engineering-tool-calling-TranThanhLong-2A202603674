@@ -49,26 +49,27 @@ def demo_prompt_error() -> None:
 
 
 # ---------------------------------------------------------------------------
-# LỖI 2 — TOOL SCHEMA: thiếu enum/ví dụ trong schema -> model truyền sai giá trị.
+# LỖI 2 — TOOL SCHEMA: thiếu mô tả định dạng trong schema -> model truyền sai giá trị.
 # ---------------------------------------------------------------------------
 def demo_tool_schema_error() -> None:
-    banner("LỖI 2 — TOOL SCHEMA: thiếu enum -> arguments sai giá trị")
+    banner("LỖI 2 — TOOL SCHEMA: thiếu mô tả định dạng -> arguments sai giá trị")
 
-    print(">> SYMPTOM: schema query_sales KHÔNG khai báo enum/ví dụ cho 'region'.")
-    print("   Model đoán region theo ngôn ngữ người dùng -> truyền 'miền Bắc':")
-    bad_args = {"region": "miền Bắc"}
-    res_bad = execute_tool("query_sales", bad_args)
-    print("   execute_tool('query_sales',", bad_args, ") ->")
+    print(">> SYMPTOM: schema search_flights KHÔNG nói 'origin' phải là mã IATA.")
+    print("   Model đoán theo ngôn ngữ người dùng -> truyền 'Hà Nội':")
+    trip = {"destination": "DAD", "departure_date": "2099-01-01", "travelers": 2}
+    bad_args = {"origin": "Hà Nội", **trip}
+    res_bad = execute_tool("search_flights", bad_args)
+    print("   execute_tool('search_flights',", bad_args, ") ->")
     print("   ", json.dumps(res_bad, ensure_ascii=False))
 
     print("\n>> DIAGNOSIS: hàm chạy đúng, prompt đúng, nhưng ARGUMENTS sai vì schema")
-    print("   không ràng buộc giá trị hợp lệ. Đây là LỖI TOOL SCHEMA.")
+    print("   không ràng buộc định dạng hợp lệ. Đây là LỖI TOOL SCHEMA.")
 
-    print("\n>> FIX: thêm  \"enum\": [\"North\",\"South\",\"Central\"]  vào schema 'region'")
-    print("   (đã có sẵn trong tools.py) để model buộc phải truyền đúng mã:")
-    good_args = {"region": "North"}
-    res_ok = execute_tool("query_sales", good_args)
-    print("   execute_tool('query_sales',", good_args, ") ->")
+    print("\n>> FIX: mô tả 'Mã IATA sân bay đi, ví dụ HAN' cho 'origin'")
+    print("   (đã có sẵn trong tools.py) để model truyền đúng mã:")
+    good_args = {"origin": "HAN", **trip}
+    res_ok = execute_tool("search_flights", good_args)
+    print("   execute_tool('search_flights',", good_args, ") ->")
     print("   ", json.dumps(res_ok, ensure_ascii=False))
 
 
@@ -78,7 +79,7 @@ def demo_tool_schema_error() -> None:
 def run_agent_broken(user_msg: str, model=None) -> str:
     """Bản agent loop HỎNG: gọi tool nhưng KHÔNG feed kết quả lại cho model."""
     model = model or MockModel()
-    resp = model.decide(SYSTEM_PROMPT, user_msg, ["get_weather", "query_sales"])
+    resp = model.decide(SYSTEM_PROMPT, user_msg, ["search_flights"])
     if resp.wants_tool:
         call = resp.tool_calls[0]
         _ = execute_tool(call.name, call.arguments)  # BUG: bỏ quên kết quả!
@@ -89,7 +90,7 @@ def run_agent_broken(user_msg: str, model=None) -> str:
 
 def demo_control_flow_error() -> None:
     banner("LỖI 3 — CONTROL FLOW: quên feed tool result -> câu trả lời rỗng")
-    q = "Thời tiết Hà Nội hôm nay thế nào?"
+    q = "Tìm chuyến bay HAN đến DAD ngày 2099-01-01 cho 2 người"
 
     print(">> SYMPTOM (run_agent_broken — thiếu bước feed kết quả về model):")
     print("   FINAL:", run_agent_broken(q))
